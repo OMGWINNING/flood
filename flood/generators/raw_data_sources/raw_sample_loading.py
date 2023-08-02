@@ -167,3 +167,59 @@ def load_samples(
         return df[columns[0]].to_list()
     else:
         return df.rows()
+
+def load_json_samples(
+    network: str,
+    datatype: str,
+    filetype: str,
+    n: int,
+    *,
+    size: str | None = None,
+    version: str = raw_data_spec.raw_data_version,
+    samples_dir: str | None = None,
+    binary_convert: bool = True,
+    download_missing: bool = True,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[typing.Any]:
+    import polars as pl
+
+    path = get_raw_json_samples_path(
+        datatype=filetype,
+        network=network,
+        samples_dir=samples_dir,
+    )
+
+    columns = {
+        'uos_estimate': ['uo_estimate'],
+        'uos_sponsor': ['uo_sponsor'],
+        'uos_estimate_sponsor': ['uo_estimate_sponsor'],
+    }[datatype]
+
+    df = pl.read_json(path)[columns]
+    if n > len(df):
+        import math
+
+        n_copies = math.ceil(n / len(df))
+        df = pl.concat(n_copies * [df])
+    if n < len(df):
+        rng = generators.get_rng(random_seed=random_seed)
+        seed = rng.integers(1_000_000_000, size=1)[0]
+        df = df.sample(n, shuffle=True, seed=seed)
+
+    if len(columns) == 1:
+        return df[columns[0]].to_list()
+    else:
+        return df.rows()
+
+def get_raw_json_samples_path(
+    network: str,
+    datatype: str,
+    *,
+    samples_dir: str | None = None,
+) -> str | None:
+    import os
+    
+    if samples_dir is None:
+        samples_dir = generators.get_flood_samples_dir()
+    filename = f'{network}_{datatype}_samples.json'
+    return os.path.join(samples_dir, filename)

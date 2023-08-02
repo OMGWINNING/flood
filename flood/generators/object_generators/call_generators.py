@@ -9,6 +9,121 @@ from . import block_generators
 from . import slot_generators
 from . import transaction_generators
 
+#
+# # ERC-4337
+#
+
+
+def generate_calls_eth_get_user_operation_by_hash(
+    n_calls: int | None = None,
+    *,
+    network: str | None = None,
+    uo_hashes: typing.Sequence[str] | None = None,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
+    import ctc.rpc
+
+    if uo_hashes is None:
+        if n_calls is None:
+            raise Exception('must floodify more parameters')
+        uo_hashes = transaction_generators.generate_uo_hashes(
+            n_calls,
+            network=network,
+            random_seed=random_seed,
+        )
+    return [
+        ctc.rpc.rpc_request.create(method='eth_getUserOperationByHash', parameters=[uo_hash])
+        for uo_hash in uo_hashes
+    ]
+
+def generate_calls_eth_get_user_operation_receipt(
+    n_calls: int | None = None,
+    *,
+    network: str | None = None,
+    uo_hashes: typing.Sequence[str] | None = None,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
+    import ctc.rpc
+
+    if uo_hashes is None:
+        if n_calls is None:
+            raise Exception('must floodify more parameters')
+        uo_hashes = transaction_generators.generate_uo_hashes(
+            n_calls,
+            network=network,
+            random_seed=random_seed,
+        )
+    return [
+        ctc.rpc.rpc_request.create(method='eth_getUserOperationReceipt', parameters=[uo_hash])
+        for uo_hash in uo_hashes
+    ]
+
+def generate_calls_eth_estimate_user_operation_gas(
+    n_calls: int | None = None,
+    *,
+    network: str | None = None,
+    uos: typing.Sequence[str] | None = None,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
+    import ctc.rpc
+
+    if uos is None:
+        if n_calls is None:
+            raise Exception('must floodify more parameters')
+        uos = transaction_generators.generate_uos_estimate(
+            n_calls,
+            network=network,
+            random_seed=random_seed,
+        )
+    return [
+        ctc.rpc.rpc_request.create(method='eth_estimateUserOperationGas', parameters=[uo, "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"])
+        for uo in uos
+    ]
+
+def generate_calls_alchemy_request_paymaster_and_data(
+    n_calls: int | None = None,
+    *,
+    network: str | None = None,
+    uos: typing.Sequence[str] | None = None,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
+    import ctc.rpc
+
+    if uos is None:
+        if n_calls is None:
+            raise Exception('must floodify more parameters')
+        uos = transaction_generators.generate_uos_sponsor(
+            n_calls,
+            network=network,
+            random_seed=random_seed,
+        )
+    return [
+        ctc.rpc.rpc_request.create(method='alchemy_requestPaymasterAndData', parameters=[uo])
+        for uo in uos
+    ]
+
+def generate_calls_alchemy_request_gas_and_paymaster_and_data(
+    n_calls: int | None = None,
+    *,
+    network: str | None = None,
+    uos: typing.Sequence[str] | None = None,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
+    import ctc.rpc
+
+    if uos is None:
+        if n_calls is None:
+            raise Exception('must floodify more parameters')
+        uos = transaction_generators.generate_uos_estimate_sponsor(
+            n_calls,
+            network=network,
+            random_seed=random_seed,
+        )
+    return [
+        ctc.rpc.rpc_request.create(method='alchemy_requestGasAndPaymasterAndData', parameters=[uo])
+        for uo in uos
+    ]
+
 
 #
 # # blocks

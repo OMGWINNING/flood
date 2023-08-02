@@ -18,6 +18,20 @@ def get_ctc_alias_url(url: str) -> str | None:
     except ImportError:
         return None
 
+def get_chain_id(url: str) -> str:
+    try:
+        import ctc.rpc
+        return ctc.rpc.sync_eth_chain_id(context={'provider': url})
+    except Exception:
+        return None
+    
+def chain_id_to_network(chain_id: str) -> str:
+    networks = {
+        1: 'ethereum',
+        10: 'optmainnet',
+        420: 'optgoerli',
+    }
+    return networks[chain_id]
 
 def parse_nodes(
     nodes: spec.NodesShorthand,
@@ -61,9 +75,10 @@ def print_nodes_table(nodes: typing.Mapping[str, spec.Node]) -> None:
             node['name'],
             url,
             client_version,
+            node['network']
         ]
         rows.append(row)
-    labels = ['node', 'url', 'metadata']
+    labels = ['node', 'url', 'metadata', 'network']
     print()
     outputs.print_multiline_table(
         rows=rows,
@@ -138,7 +153,8 @@ def parse_node(
             client_version = get_node_client_version(url=url, remote=remote)
 
             # get network
-            network = 'ethereum'
+            chain_id = get_chain_id(url=url)
+            network = chain_id_to_network(chain_id=chain_id)
 
         else:
             client_version = None
