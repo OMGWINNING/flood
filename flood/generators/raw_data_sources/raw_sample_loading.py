@@ -190,6 +190,7 @@ def load_json_samples(
     )
 
     columns = {
+        'uo_hashes': ['uo_hash'],
         'uos_estimate': ['uo_estimate'],
         'uos_sponsor': ['uo_sponsor'],
         'uos_estimate_sponsor': ['uo_estimate_sponsor'],
