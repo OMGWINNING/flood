@@ -27,6 +27,7 @@ def generate_uo_hashes(
     return generators.load_json_samples(
         network=network,
         datatype='uo_hashes',
+        filetype='uo_hashes',
         n=n,
         random_seed=random_seed,
     )
