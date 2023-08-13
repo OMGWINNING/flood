@@ -13,6 +13,18 @@ from . import transaction_generators
 # # ERC-4337
 #
 
+def generate_calls_eth_supported_entry_points(
+    n_calls: int | None = None
+) -> typing.Sequence[flood.Call]:
+    import ctc.rpc
+
+    if n_calls is None:
+        raise Exception('must floodify more parameters')
+
+    return [
+        ctc.rpc.rpc_request.create(method='eth_supportedEntryPoints', parameters=[])
+        for _ in range(n_calls) 
+    ]
 
 def generate_calls_eth_get_user_operation_by_hash(
     n_calls: int | None = None,
